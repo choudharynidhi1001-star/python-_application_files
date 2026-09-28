@@ -1,0 +1,256 @@
+Common Code
+import pandas as pd
+
+data = {
+"RollNo":[101,102,103,104,105,106,107,108],
+"Name":["Amit","Neha","Rahul","Priya","Rohan","Kavya","Arjun","Simran"],
+"Department":["BCA","BCA","MCA","BCA","MCA","MCA","BCA","MCA"],
+"Age":[20,21,22,20,23,22,21,24],
+"Marks":[85,92,67,78,88,95,55,73]
+}
+
+df = pd.DataFrame(data)
+Level 1 — Basic
+Q1. Complete DataFrame
+print(df)
+
+Output:
+
+   RollNo    Name Department  Age  Marks
+0     101    Amit        BCA   20     85
+1     102    Neha        BCA   21     92
+2     103   Rahul        MCA   22     67
+3     104   Priya        BCA   20     78
+4     105   Rohan        MCA   23     88
+5     106   Kavya        MCA   22     95
+6     107   Arjun        BCA   21     55
+7     108  Simran        MCA   24     73
+Q2. First 3
+print(df.head(3))
+
+Output: Amit, Neha, Rahul
+
+Q3. Last 2
+print(df.tail(2))
+
+Output: Arjun, Simran
+
+Q4. Rows and Columns
+print(df.shape)
+
+Output:
+
+(8, 5)
+Q5. Column Names
+print(df.columns)
+
+Output:
+
+RollNo, Name, Department, Age, Marks
+Q6. Data Types
+print(df.dtypes)
+
+Output:
+
+RollNo          int64
+Name           object
+Department     object
+Age             int64
+Marks           int64
+Q7. Name
+print(df["Name"])
+Q8. Name and Marks
+print(df[["Name","Marks"]])
+Level 2 — Selection & Filtering
+Q9. Marks > 80
+print(df[df["Marks"] > 80])
+
+Output: Amit, Neha, Rohan, Kavya
+
+Q10. Marks < 70
+print(df[df["Marks"] < 70])
+
+Output: Rahul, Arjun
+
+Q11. Marks 70–90
+print(df[df["Marks"].between(70,90)])
+
+Output: Amit, Priya, Rohan, Simran
+
+Q12. BCA Students
+print(df[df["Department"]=="BCA"])
+Q13. MCA + Marks > 80
+print(df[(df["Department"]=="MCA") & (df["Marks"]>80)])
+
+Output: Rohan, Kavya
+
+Q14. Age > 21
+print(df[df["Age"]>21])
+
+Output: Rahul, Rohan, Kavya, Simran
+
+Level 3 — Data Analysis
+Q15. Average
+print(df["Marks"].mean())
+
+Output:
+
+79.125
+Q16. Maximum
+print(df["Marks"].max())
+
+Output:
+
+95
+Q17. Minimum
+print(df["Marks"].min())
+
+Output:
+
+55
+Q18. Median
+print(df["Marks"].median())
+
+Output:
+
+81.5
+Q19. Above 75
+print((df["Marks"]>75).sum())
+
+Output:
+
+5
+Q20. BCA Average
+print(df[df["Department"]=="BCA"]["Marks"].mean())
+
+Output:
+
+77.5
+Q21. MCA Average
+print(df[df["Department"]=="MCA"]["Marks"].mean())
+
+Output:
+
+80.75
+Q22. Highest Student
+print(df.loc[df["Marks"].idxmax()])
+
+Output:
+
+Name      Kavya
+Marks        95
+Level 4 — Data Manipulation
+Q23. Bonus
+df["Bonus"] = 5
+print(df)
+Q24. FinalMarks
+df["FinalMarks"] = df["Marks"] + df["Bonus"]
+print(df[["Name","FinalMarks"]])
+
+Output:
+
+Amit       90
+Neha       97
+Rahul      72
+Priya      83
+Rohan      93
+Kavya     100
+Arjun      60
+Simran     78
+Q25. Result
+df["Result"] = df["Marks"].apply(
+    lambda x: "Pass" if x>=40 else "Fail"
+)
+print(df[["Name","Result"]])
+
+Output: All students → Pass
+
+Q26. Grade
+def grade(x):
+    if x>=90: return "A+"
+    elif x>=80: return "A"
+    elif x>=70: return "B"
+    elif x>=60: return "C"
+    else: return "D"
+
+df["Grade"] = df["Marks"].apply(grade)
+print(df[["Name","Marks","Grade"]])
+
+Output:
+
+Amit    85  A
+Neha    92  A+
+Rahul   67  C
+Priya   78  B
+Rohan   88  A
+Kavya   95  A+
+Arjun   55  D
+Simran  73  B
+Level 5 — Ranking
+Q27. Highest to Lowest
+print(df.sort_values("Marks",ascending=False))
+Q28. Top 3
+print(df.nlargest(3,"Marks"))
+
+Output:
+
+Kavya   95
+Neha    92
+Rohan   88
+Q29. Rank
+df["Rank"] = df["Marks"].rank(ascending=False)
+print(df[["Name","Marks","Rank"]])
+Level 6 — Group Analysis
+Q30. Students per Department
+print(df.groupby("Department")["Name"].count())
+
+Output:
+
+BCA    4
+MCA    4
+Q31. Average Marks
+print(df.groupby("Department")["Marks"].mean())
+
+Output:
+
+BCA    77.50
+MCA    80.75
+Q32. Maximum Marks
+print(df.groupby("Department")["Marks"].max())
+
+Output:
+
+BCA    92
+MCA    95
+Q33. Minimum Marks
+print(df.groupby("Department")["Marks"].min())
+
+Output:
+
+BCA    55
+MCA    67
+Challenge — Merit List + Excel
+df["Rank"] = df["Marks"].rank(
+    ascending=False, method="min"
+).astype(int)
+
+merit = df[[
+    "Rank","RollNo","Name","Department",
+    "Marks","Grade","Result"
+]].sort_values("Marks",ascending=False)
+
+print(merit)
+
+merit.to_excel("student_merit_list.xlsx", index=False)
+Output
+   Rank  RollNo    Name Department  Marks Grade Result
+5     1     106   Kavya        MCA     95    A+   Pass
+1     2     102    Neha        BCA     92    A+   Pass
+4     3     105   Rohan        MCA     88     A   Pass
+0     4     101    Amit        BCA     85     A   Pass
+3     5     104   Priya        BCA     78     B   Pass
+7     6     108  Simran        MCA     73     B   Pass
+2     7     103   Rahul        MCA     67     C   Pass
+6     8     107   Arjun        BCA     55     D   Pass
+
+Excel file: student_merit_list.xlsx current Python working folder mein save hogi.
