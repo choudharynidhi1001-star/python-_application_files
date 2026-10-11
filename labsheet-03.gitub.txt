@@ -1,0 +1,117 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# ---------------------------------------------------------
+# 1. DATASET CREATION & LOADING
+# ---------------------------------------------------------
+# Sample data definition based on the given requirements
+data = {
+    'Student ID': [101, 102, 103, 104, 105, 106, 107, 108, 109, 110],
+    'Student Name': ['Aarav', 'Bhavna', 'Chetan', 'Divya', 'Esha', 'Farhan', 'Gauri', 'Harsh', 'Isha', 'Jatin'],
+    'Gender': ['Male', 'Female', 'Male', 'Female', 'Female', 'Male', 'Female', 'Male', 'Female', 'Male'],
+    'Department': ['BCA', 'BCA', 'CSE', 'CSE', 'BCA', 'ECE', 'CSE', 'ECE', 'BCA', 'CSE'],
+    'Attendance': [85, 92, 60, 78, 95, 55, 88, 65, 90, 72],
+    'Study Hours': [5, 8, 2, 4, 9, 2, 7, 3, 8, 5],
+    'Assignment Marks': [88, 95, 50, 70, 92, 45, 85, 60, 90, 75],
+    'Internal Assessment Marks': [80, 90, 55, 75, 95, 40, 82, 58, 88, 70],
+    'Python Marks': [85, 92, 45, 78, 96, 50, 89, 62, 91, 74],
+    'DBMS Marks': [78, 88, 52, 80, 90, 48, 86, 55, 85, 68],
+    'AI Marks': [82, 94, 48, 72, 98, 42, 90, 50, 92, 70],
+    'Final Exam Marks': [80, 91, 50, 76, 94, 45, 87, 57, 89, 72]
+}
+
+df = pd.DataFrame(data)
+
+# Calculate Total and Average Marks for performance metrics
+df['Total Marks'] = df['Python Marks'] + df['DBMS Marks'] + df['AI Marks'] + df['Final Exam Marks']
+df['Average Marks'] = df['Total Marks'] / 4
+
+print("--- Initial Dataset ---")
+print(df.head())
+print("\n" + "="*50 + "\n")
+
+# ---------------------------------------------------------
+# 2. ANALYSIS & OBJECTIVES
+# ---------------------------------------------------------
+
+# High-performing students (Average Marks > 85)
+high_performers = df[df['Average Marks'] >= 85]
+
+# Low-performing students (Average Marks < 60)
+low_performers = df[df['Average Marks'] < 60]
+
+print("--- High-Performing Students ---")
+print(high_performers[['Student ID', 'Student Name', 'Department', 'Average Marks']])
+
+print("\n--- Low-Performing Students ---")
+print(low_performers[['Student ID', 'Student Name', 'Department', 'Average Marks']])
+
+# Subject-wise Average Performance
+subject_avg = df[['Python Marks', 'DBMS Marks', 'AI Marks', 'Final Exam Marks']].mean()
+print("\n--- Subject-wise Average Marks ---")
+print(subject_avg)
+
+# Department-wise Average Performance
+dept_performance = df.groupby('Department')['Average Marks'].mean()
+print("\n--- Department-wise Average Performance ---")
+print(dept_performance)
+
+print("\n" + "="*50 + "\n")
+
+# ---------------------------------------------------------
+# 3. VISUALIZATIONS USING MATPLOTLIB
+# ---------------------------------------------------------
+
+plt.style.use('seaborn-v0_8-whitegrid' if 'seaborn-v0_8-whitegrid' in plt.style.available else 'default')
+
+# 1. Subject-wise Performance (Bar Chart)
+plt.figure(figsize=(8, 5))
+subject_avg.plot(kind='bar', color=['#4C72B0', '#55A868', '#C44E52', '#8172B0'])
+plt.title('Subject-wise Average Marks')
+plt.xlabel('Subjects')
+plt.ylabel('Average Marks')
+plt.ylim(0, 100)
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.show()
+
+# 2. Department-wise Performance (Bar Chart)
+plt.figure(figsize=(7, 5))
+dept_performance.plot(kind='bar', color='#DD8452')
+plt.title('Department-wise Average Performance')
+plt.xlabel('Department')
+plt.ylabel('Average Marks')
+plt.ylim(0, 100)
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.show()
+
+# 3. Attendance Patterns (Histogram)
+plt.figure(figsize=(7, 5))
+plt.hist(df['Attendance'], bins=5, color='#55A868', edgecolor='black')
+plt.title('Attendance Distribution')
+plt.xlabel('Attendance Percentage (%)')
+plt.ylabel('Number of Students')
+plt.tight_layout()
+plt.show()
+
+# 4. Relationship between Study Hours and Marks (Scatter Plot)
+plt.figure(figsize=(7, 5))
+plt.scatter(df['Study Hours'], df['Average Marks'], color='#C44E52', s=100)
+plt.title('Study Hours vs Average Marks')
+plt.xlabel('Study Hours (per day)')
+plt.ylabel('Average Marks')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# 5. Relationship between Attendance and Performance (Scatter Plot)
+plt.figure(figsize=(7, 5))
+plt.scatter(df['Attendance'], df['Average Marks'], color='#8172B0', s=100)
+plt.title('Attendance vs Average Marks')
+plt.xlabel('Attendance (%)')
+plt.ylabel('Average Marks')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
