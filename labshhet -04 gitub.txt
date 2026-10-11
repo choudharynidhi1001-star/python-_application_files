@@ -1,0 +1,124 @@
+# ==============================================================================
+# LAB SHEET 04: Python Libraries and Application (TensorFlow / Keras)
+# ==============================================================================
+
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+print("--- Question 1: Check TensorFlow Version ---")
+# Q1. Install and verify the version of TensorFlow[cite: 1]
+print(f"TensorFlow Version: {tf.__version__}")
+print("-" * 50)
+
+
+print("\n--- Question 2: Simple Linear Regression using TensorFlow ---")
+# Q2. Create a simple linear regression model using TensorFlow[cite: 1]
+X = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0], dtype=tf.float32)
+y = tf.constant([2.0, 4.0, 6.0, 8.0, 10.0], dtype=tf.float32) # y = 2x
+
+model_lr = keras.Sequential([layers.Dense(units=1, input_shape=[1])])
+model_lr.compile(optimizer='sgd', loss='mean_squared_error')
+model_lr.fit(X, y, epochs=100, verbose=0)
+print(f"Prediction for x=6.0 (Expected ~12.0): {model_lr.predict(tf.constant([6.0]))[0][0]:.2f}")
+print("-" * 50)
+
+
+print("\n--- Question 3: Element-wise Matrix Multiplication ---")
+# Q3. Use TensorFlow to perform element-wise matrix multiplication[cite: 1]
+matrix_a = tf.constant([[1, 2], [3, 4]])
+matrix_b = tf.constant([[5, 6], [7, 8]])
+elementwise_mult = tf.multiply(matrix_a, matrix_b)
+print("Matrix A:\n", matrix_a.numpy())
+print("Matrix B:\n", matrix_b.numpy())
+print("Element-wise Multiplication:\n", elementwise_mult.numpy())
+print("-" * 50)
+
+
+print("\n--- Question 4: tf.GradientTape for Gradients ---")
+# Q4. Demonstrate how to use tf.GradientTape to compute gradients[cite: 1]
+# Compute dy/dx for y = x^2 at x = 3.0 (Gradient should be 2*x = 6.0)
+x = tf.Variable(3.0)
+with tf.GradientTape() as tape:
+    y = x ** 2
+dy_dx = tape.gradient(y, x)
+print(f"Gradient dy/dx of y=x^2 at x=3.0 is: {dy_dx.numpy()}")
+print("-" * 50)
+
+
+print("\n--- Question 5: Custom Loss Function ---")
+# Q5. Build a custom loss function and use it in model compilation[cite: 1]
+def custom_mse(y_true, y_pred):
+    return tf.reduce_mean(tf.square(y_true - y_pred))
+
+model_custom_loss = keras.Sequential([layers.Dense(1, input_shape=[1])])
+model_custom_loss.compile(optimizer='adam', loss=custom_mse)
+print("Model compiled successfully with custom MSE loss function.")
+print("-" * 50)
+
+
+print("\n--- Question 6: ReLU Activation Function ---")
+# Q6. Implement an activation function (ReLU) using TensorFlow[cite: 1]
+input_tensor = tf.constant([-5.0, -1.0, 0.0, 2.0, 5.0])
+relu_output = tf.nn.relu(input_tensor)
+print(f"Inputs: {input_tensor.numpy()}")
+print(f"ReLU Outputs: {relu_output.numpy()}")
+print("-" * 50)
+
+
+print("\n--- Question 7: Approximate Sine Function ---")
+# Q7. Create and train a neural network to approximate the sine function[cite: 1]
+X_sine = np.linspace(-np.pi, np.pi, 500)
+y_sine = np.sin(X_sine)
+
+model_sine = keras.Sequential([
+    layers.Dense(32, activation='relu', input_shape=[1]),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(1)
+])
+model_sine.compile(optimizer='adam', loss='mse')
+model_sine.fit(X_sine, y_sine, epochs=150, batch_size=32, verbose=0)
+pred_sine = model_sine.predict(np.array([np.pi / 2]))[0][0]
+print(f"Sine(pi/2) Prediction: {pred_sine:.4f} (Actual: 1.0)")
+print("-" * 50)
+
+
+print("\n--- Question 8: Feedforward Neural Network for Binary Classification ---")
+# Q8. Build a feedforward neural network for binary classification using Keras Sequential API[cite: 1]
+model_binary = keras.Sequential([
+    layers.Dense(16, activation='relu', input_shape=(10,)),
+    layers.Dense(8, activation='relu'),
+    layers.Dense(1, activation='sigmoid') # Binary output
+])
+model_binary.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+print("Binary Classification model built and compiled successfully.")
+print("-" * 50)
+
+
+print("\n--- Question 9: Visualize Model Architecture ---")
+# Q9. Visualize model architecture using model.summary() and plot_model()[cite: 1]
+print("Summary of Binary Classification Model:")
+model_binary.summary() #[cite: 1]
+
+# To save visual representation as image (requires pydot & graphviz installed):
+try:
+    keras.utils.plot_model(model_binary, to_file='model_architecture.png', show_shapes=True) #[cite: 1]
+    print("Model architecture plot saved as 'model_architecture.png'.")
+except Exception as e:
+    print("plot_model requires pydot and graphviz. (Skipped visual render)")
+print("-" * 50)
+
+
+print("\n--- Question 10: Save and Load Keras Model ---")
+# Q10. Write code to save and load a trained Keras model[cite: 1]
+model_binary.save("my_keras_model.keras") #[cite: 1]
+print("Model saved as 'my_keras_model.keras'.")
+
+loaded_model = keras.models.load_model("my_keras_model.keras") #[cite: 1]
+print("Model loaded successfully from file.")
+print("-" * 50)
+
+
+print("\n--- Question 11: Callbacks (EarlyStopping and ModelCheckpoint) ---")
+# Q11.
