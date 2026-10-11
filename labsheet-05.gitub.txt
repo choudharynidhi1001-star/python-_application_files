@@ -1,0 +1,224 @@
+import cv2
+import numpy as np
+
+# =========================================================
+# Q1. Write a Python script to load and display an image using OpenCV.
+# =========================================================
+def q1_load_display_image(image_path):
+    img = cv2.imread(image_path)
+    if img is not None:
+        cv2.imshow("Q1 - Loaded Image", img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    else:
+        print("Error: Image not found.")
+
+# =========================================================
+# Q2. Convert a color image to grayscale and display both side-by-side.
+# =========================================================
+def q2_grayscale_side_by_side(image_path):
+    img = cv2.imread(image_path)
+    if img is not None:
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # Convert gray back to 3-channel for horizontal concatenation
+        gray_3ch = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+        combined = np.hstack((img, gray_3ch))
+        cv2.imshow("Q2 - Original vs Grayscale", combined)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+# =========================================================
+# Q3. Display the RGB and HSV versions of the same image in separate windows.
+# =========================================================
+def q3_rgb_hsv_versions(image_path):
+    img = cv2.imread(image_path)
+    if img is not None:
+        rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        cv2.imshow("Q3 - RGB Version", rgb)
+        cv2.imshow("Q3 - HSV Version", hsv)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+# =========================================================
+# Q4. Resize an image to 200x200 pixels using OpenCV.
+# =========================================================
+def q4_resize_image(image_path):
+    img = cv2.imread(image_path)
+    if img is not None:
+        resized = cv2.resize(img, (200, 200))
+        cv2.imshow("Q4 - Resized 200x200", resized)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+# =========================================================
+# Q5. Write a program to rotate an image by a given angle (e.g., 45°).
+# =========================================================
+def q5_rotate_image(image_path, angle=45):
+    img = cv2.imread(image_path)
+    if img is not None:
+        (h, w) = img.shape[:2]
+        center = (w // 2, h // 2)
+        matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+        rotated = cv2.warpAffine(img, matrix, (w, h))
+        cv2.imshow(f"Q5 - Rotated {angle} Degrees", rotated)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+# =========================================================
+# Q6. Implement image flipping (horizontal, vertical, both).
+# =========================================================
+def q6_flip_image(image_path):
+    img = cv2.imread(image_path)
+    if img is not None:
+        flip_h = cv2.flip(img, 1)  # Horizontal
+        flip_v = cv2.flip(img, 0)  # Vertical
+        flip_both = cv2.flip(img, -1) # Both
+        
+        cv2.imshow("Q6 - Horizontal Flip", flip_h)
+        cv2.imshow("Q6 - Vertical Flip", flip_v)
+        cv2.imshow("Q6 - Both Flip", flip_both)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+# =========================================================
+# Q7. Crop a specific region from an image and display it.
+# =========================================================
+def q7_crop_image(image_path):
+    img = cv2.imread(image_path)
+    if img is not None:
+        # Syntax: img[startY:endY, startX:endX]
+        cropped = img[50:200, 50:200]
+        cv2.imshow("Q7 - Cropped Region", cropped)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+# =========================================================
+# Q8. Use Haar cascades to detect faces in an image and draw rectangles.
+# Q9. Detect eyes or full body using pre-trained Haar cascade models.
+# =========================================================
+def q8_q9_face_eye_detection(image_path):
+    img = cv2.imread(image_path)
+    if img is not None:
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
+        
+        faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+        for (x, y, w, h) in faces:
+            cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
+            roi_gray = gray[y:y+h, x:x+w]
+            roi_color = img[y:y+h, x:x+w]
+            eyes = eye_cascade.detectMultiScale(roi_gray)
+            for (ex, ey, ew, eh) in eyes:
+                cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
+                
+        cv2.imshow("Q8 & Q9 - Face & Eye Detection", img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+# =========================================================
+# Q10. Identify and classify basic geometric shapes (circle, rectangle, triangle)
+# =========================================================
+def q10_shape_detection(image_path):
+    img = cv2.imread(image_path)
+    if img is not None:
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        _, thresh = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
+        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        for cnt in contours:
+            approx = cv2.approxPolyDP(cnt, 0.04 * cv2.arcLength(cnt, True), True)
+            x = cnt[0][0][0]
+            y = cnt[0][0][1] - 10
+            
+            if len(approx) == 3:
+                shape = "Triangle"
+            elif len(approx) == 4:
+                shape = "Rectangle"
+            else:
+                shape = "Circle"
+                
+            cv2.putText(img, shape, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            cv2.drawContours(img, [approx], 0, (0, 255, 0), 2)
+            
+        cv2.imshow("Q10 - Shape Detection", img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+# =========================================================
+# Q11. Capture video from a webcam and display it live.
+# Q12. Convert each video frame to grayscale in real-time.
+# =========================================================
+def q11_q12_live_webcam_stream():
+    cap = cv2.VideoCapture(0)
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
+        # Q12: Convert frame to grayscale in real-time
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        
+        cv2.imshow("Q11 - Live Webcam", frame)
+        cv2.imshow("Q12 - Real-time Grayscale", gray_frame)
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
+# =========================================================
+# Q13. Capture and save 100 frames from a live webcam feed as image files.
+# =========================================================
+def q13_save_webcam_frames():
+    cap = cv2.VideoCapture(0)
+    count = 0
+    while count < 100 and cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        cv2.imwrite(f"frame_{count+1}.jpg", frame)
+        count += 1
+        cv2.imshow("Capturing Frames", frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+    print(f"Successfully saved {count} frames.")
+
+# =========================================================
+# Q14. Draw a rectangle, circle, and line on a blank canvas using OpenCV.
+# =========================================================
+def q14_draw_shapes():
+    canvas = np.zeros((400, 400, 3), dtype="uint8")
+    # Draw line (Start, End, Color, Thickness)
+    cv2.line(canvas, (20, 20), (380, 20), (255, 255, 255), 2)
+    # Draw rectangle (Top-Left, Bottom-Right, Color, Thickness)
+    cv2.rectangle(canvas, (50, 50), (150, 150), (0, 255, 0), 3)
+    # Draw circle (Center, Radius, Color, Thickness)
+    cv2.circle(canvas, (300, 100), 50, (0, 0, 255), -1)
+    
+    cv2.imshow("Q14 - Blank Canvas Shapes", canvas)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+# =========================================================
+# Q15. Add text to an image using different font styles and sizes.
+# =========================================================
+def q15_add_text():
+    canvas = np.zeros((300, 600, 3), dtype="uint8")
+    cv2.putText(canvas, "COER University", (50, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+    cv2.putText(canvas, "Lab Sheet 5", (50, 150), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 255), 2)
+    cv2.putText(canvas, "OpenCV Python", (50, 220), cv2.FONT_HERSHEY_DUPLEX, 1.2, (0, 0, 255), 3)
+    
+    cv2.imshow("Q15 - Text Overlay", canvas)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+# --- Example Execution ---
+if __name__ == "__main__":
+    # Apni kisi sample image ka path yaha de sakte hain, jaise 'sample.jpg'
+    # q1_load_display_image('sample.jpg')
+    q14_draw_shapes()
+    q15_add_text()
